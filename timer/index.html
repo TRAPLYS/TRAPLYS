@@ -5,7 +5,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>持久走便利アプリ</title>
+    <meta name="author" content="Sato Masakazu">
+    <meta name="copyright" content="&copy; 2022 Sato Masakazu">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
+
+    <title>Multi Function Timer</title>
     <style>
         html,
         body {
@@ -16,9 +21,26 @@
             width: 100%;
             height: 100%;
             text-align: center;
-            overflow-x: hidden;
         }
-        
+
+        *,
+        ::placeholder {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -khtml-user-select: none;
+        }
+
+
+        body {
+            padding: 0 0 80px 0;
+        }
+
         button {
             height: 50px;
             padding: 0 0.7em;
@@ -27,12 +49,13 @@
             background: #999;
             border: none;
             margin: 3px 5px;
+            color: #000;
         }
-        
+
         button:hover {
             background: #FFF;
         }
-        
+
         #timer {
             font-size: 11vw;
             text-align: center;
@@ -40,13 +63,13 @@
             font-weight: bold;
             color: #FFF;
         }
-        
+
         #controlWrap {
             text-align: center;
             font-size: 0;
             vertical-align: middle;
         }
-        
+
         #controlWrap button {
             display: inline-block;
             width: 80px;
@@ -57,32 +80,32 @@
             transition: 200ms;
             background: #FFF;
         }
-        
+
         #controlWrap button:hover {
             box-shadow: 0 0 0 5px #666;
         }
-        
+
         #controlWrap button:active {
             transition: 100ms;
             box-shadow: none;
             transform: scale(0.9);
         }
-        
+
         #controlWrap button:disabled:hover {
             box-shadow: none;
         }
-        
+
         button#startBtn,
         button#stopBtn {
             width: 100px;
             height: 100px;
             margin: 5px;
         }
-        
+
         button#stopBtn {
             display: none;
         }
-        
+
         #table_wrap,
         #table_wrap2 {
             display: none;
@@ -90,13 +113,13 @@
             max-height: 200px;
             overflow-y: auto;
         }
-        
+
         #lapTimeTable,
         #straidTable {
             width: 100%;
             border-collapse: collapse;
         }
-        
+
         #lapTimeTable,
         #lapTimeTable tr,
         #lapTimeTable th,
@@ -104,25 +127,25 @@
             border-right: solid 1px #999;
             border-left: solid 1px #999;
         }
-        
+
         #lapTimeTable th {
             border-top: solid 1px #999;
             border-bottom: solid 1px #999;
         }
-        
+
         #lapTimeTable th {
             font-size: 18px;
         }
-        
+
         #lapTimeTable th,
         #lapTimeTable td {
             padding: 8px 5px;
         }
-        
+
         #lapTimeTable tr:nth-child(even) {
             background: #444;
         }
-        
+
         #progress,
         #dummy_progress {
             position: relative;
@@ -131,7 +154,7 @@
             height: 5px;
             margin: 10px 0;
         }
-        
+
         #progress .flag {
             position: absolute;
             top: -2.5px;
@@ -145,14 +168,14 @@
             overflow: hidden;
             opacity: 0.5;
         }
-        
+
         #progress .flag.activeflag {
             top: -7.5px;
             width: 20px;
             height: 20px;
             opacity: 1;
         }
-        
+
         #progress .flag.activeflag::before {
             position: absolute;
             top: 0;
@@ -164,12 +187,12 @@
             border-radius: 10px;
             transition: 500ms;
         }
-        
+
         #progress .flag.activeflag:hover::before {
             background: rgb(129, 177, 224);
             transition: 100ms;
         }
-        
+
         #progress .flag.activeflag:hover {
             width: 200px;
             height: 50px;
@@ -181,7 +204,7 @@
             background: rgb(21, 64, 124);
             border-radius: 10px 5px 5px 5px;
         }
-        
+
         input {
             height: 40px;
             font-size: 20px;
@@ -193,70 +216,70 @@
             background: #333;
             color: #fff;
         }
-        
+
         input:focus {
             background: #FFF;
             color: #000;
             outline: solid 2px rgb(129, 177, 224);
         }
-        
+
         #output {
             display: none;
             font-size: 18px;
         }
-        
+
         button {
             vertical-align: top;
             position: relative;
             overflow: hidden;
         }
-        
+
         button#stopBtn {
             background: rgb(157 226 255);
             animation-name: sampleanimation;
             animation-duration: 1s;
             animation-iteration-count: infinite;
         }
-        
+
         button span {
             position: absolute;
             inset: 0;
             display: none;
         }
-        
+
         button svg {
             width: 48px;
             height: 48px;
             display: inline-block;
             fill: #444;
         }
-        
+
         button#stopBtn svg {
             fill: rgb(0, 37, 73);
         }
-        
+
         button:disabled svg {
             fill: #999;
         }
-        
+
         button:hover svg {
             transform: scale(0.8);
             opacity: 0;
             fill: #666;
             transition: 300ms;
         }
-        
+
         button:disabled:hover svg {
             fill: #999;
         }
-        
+
         button.Anm01 svg {
             transform: scale(10);
             opacity: 0;
             fill: #666;
             transition: 500ms;
         }
-        
+
         button:hover span {
             display: flex;
             justify-content: center;
@@ -265,25 +288,98 @@
             font-weight: bold;
             font-size: 18px;
         }
-        
+
         details {
             margin: 30px 0;
             padding: 5px;
             border: solid 1px #666;
         }
-        
+
         summary {
             background: #333;
         }
-        
+
         summary:hover {
             background: #555;
         }
-        
+
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-wrap: wrap;
+            transition: 400ms;
+        }
+
+        #splash img {
+            display: block;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        #loading {
+            width: 100%;
+            margin: 0 auto;
+
+        }
+
+        #splash svg {
+            display: block;
+            width: 80px;
+            height: 80px;
+
+        }
+
+        small {
+            font-size: 17px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            z-index: 10000;
+            background: #333;
+            padding: 10px;
+            height: 30px;
+            line-height: 30px;
+
+        }
+
+        #lapTimeTable button {
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            padding: 0;
+            margin: 0;
+        }
+
+        header img {
+            height: 50px;
+            width: 50px;
+            vertical-align: top;
+
+        }
+
+        header h1 {
+            display: inline-block;
+            height: 50px;
+            margin: 0;
+            padding: 0;
+            vertical-align: top;
+        }
+
         @keyframes sampleanimation {
             0% {
                 box-shadow: 0 0 0 0 rgba(129, 177, 224, 0.8);
             }
+
             100% {
                 box-shadow: 0 0 0 20px rgba(129, 177, 224, 0.1);
             }
@@ -294,9 +390,29 @@
 <body>
     <noscript>
         <dialog open>
-            ダウンロードして使ってください
+            Javascriptが無効です。
         </dialog>
     </noscript>
+
+    <header>
+        <img src="./icon.svg">
+        <h1>Multi Function Timer</h1>
+    </header>
+
+    <div id="splash">
+        <img src="./icon.svg">
+
+        <div id="loading">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto;display: block; shape-rendering: auto;" width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                <circle cx="50" cy="50" r="32" stroke-width="8" stroke="#ffffff" stroke-dasharray="50.26548245743669 50.26548245743669" fill="none" stroke-linecap="round">
+                    <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="0 50 50;360 50 50"></animateTransform>
+                </circle>
+                <!-- [ldio] generated by https://loading.io/ -->
+            </svg>
+        </div>
+
+    </div>
+
     <div id="progress"></div>
 
     <div id="timer">00:00:00.00</div>
@@ -304,19 +420,27 @@
 
     <div id="controlWrap">
         <button onclick="reset()" id="resetBtn" aria-label="リセット" disabled>
-            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M22.55 41.9q-6.15-.5-10.35-5.05Q8 32.3 8 26.05q0-3.85 1.775-7.25t4.975-5.55l2.15 2.15q-2.8 1.65-4.35 4.525Q11 22.8 11 26.05q0 5 3.3 8.65 3.3 3.65 8.25 4.2Zm3 0v-3q5-.6 8.25-4.225 3.25-3.625 3.25-8.625 0-5.45-3.775-9.225Q29.5 13.05 24.05 13.05h-1l3 3-2.15 2.15-6.65-6.65L23.9 4.9l2.15 2.15-3 3h1q6.7 0 11.35 4.675 4.65 4.675 4.65 11.325 0 6.25-4.175 10.8Q31.7 41.4 25.55 41.9Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                <path d="M22.55 41.9q-6.15-.5-10.35-5.05Q8 32.3 8 26.05q0-3.85 1.775-7.25t4.975-5.55l2.15 2.15q-2.8 1.65-4.35 4.525Q11 22.8 11 26.05q0 5 3.3 8.65 3.3 3.65 8.25 4.2Zm3 0v-3q5-.6 8.25-4.225 3.25-3.625 3.25-8.625 0-5.45-3.775-9.225Q29.5 13.05 24.05 13.05h-1l3 3-2.15 2.15-6.65-6.65L23.9 4.9l2.15 2.15-3 3h1q6.7 0 11.35 4.675 4.65 4.675 4.65 11.325 0 6.25-4.175 10.8Q31.7 41.4 25.55 41.9Z" />
+            </svg>
             <span>リセット</span>
         </button>
         <button onclick="start()" id="startBtn" aria-label="スタート">
-            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M18.3 36.4q-.75.5-1.525.05Q16 36 16 35.1V12.6q0-.9.775-1.35.775-.45 1.525.05L36 22.6q.7.45.7 1.25T36 25.1Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                <path d="M18.3 36.4q-.75.5-1.525.05Q16 36 16 35.1V12.6q0-.9.775-1.35.775-.45 1.525.05L36 22.6q.7.45.7 1.25T36 25.1Z" />
+            </svg>
             <span>スタート</span>
         </button>
         <button onclick="pause()" id="stopBtn" aria-label="ストップ">
-            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M29.25 38q-1.25 0-2.125-.875T26.25 35V13q0-1.25.875-2.125T29.25 10H35q1.25 0 2.125.875T38 13v22q0 1.25-.875 2.125T35 38ZM13 38q-1.25 0-2.125-.875T10 35V13q0-1.25.875-2.125T13 10h5.75q1.25 0 2.125.875T21.75 13v22q0 1.25-.875 2.125T18.75 38Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                <path d="M29.25 38q-1.25 0-2.125-.875T26.25 35V13q0-1.25.875-2.125T29.25 10H35q1.25 0 2.125.875T38 13v22q0 1.25-.875 2.125T35 38ZM13 38q-1.25 0-2.125-.875T10 35V13q0-1.25.875-2.125T13 10h5.75q1.25 0 2.125.875T21.75 13v22q0 1.25-.875 2.125T18.75 38Z" />
+            </svg>
             <span>ストップ</span>
         </button>
         <button onclick="lap()" id="laptimeBtn" aria-label="ラップタイム" disabled>
-            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M11.5 42q-.65 0-1.075-.425Q10 41.15 10 40.5v-31q0-.65.425-1.075Q10.85 8 11.5 8h14.45q.55 0 .95.325.4.325.5.875l.7 3.1h10.4q.65 0 1.075.425Q40 13.15 40 13.8v15.5q0 .65-.425 1.075-.425.425-1.075.425H28.4q-.5 0-.925-.325-.425-.325-.525-.825l-.7-3.1H13V40.5q0 .65-.425 1.075Q12.15 42 11.5 42Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+                <path d="M11.5 42q-.65 0-1.075-.425Q10 41.15 10 40.5v-31q0-.65.425-1.075Q10.85 8 11.5 8h14.45q.55 0 .95.325.4.325.5.875l.7 3.1h10.4q.65 0 1.075.425Q40 13.15 40 13.8v15.5q0 .65-.425 1.075-.425.425-1.075.425H28.4q-.5 0-.925-.325-.425-.325-.525-.825l-.7-3.1H13V40.5q0 .65-.425 1.075Q12.15 42 11.5 42Z" />
+            </svg>
             <span>ラップ<br>タイム</span>
         </button>
     </div>
@@ -330,7 +454,7 @@
                     <th>id</th>
                     <th>タイム</th>
                     <th>ラップタイム</th>
-                    <th>取り消し</th>
+                    <th></th>
                 </tr>
             </table>
         </div>
@@ -374,9 +498,22 @@
         <button onclick="save()">データを保存</button>
     </div>
 
-    <footer><small>&copy; 2022 SatoMasakazu</small></footer>
+    <footer>
+        <small>&copy; 2022 Sato Masakazu</small>
+        <a href="index.html" download="タイマー.html" target="_blank">ダウンロードして使う</a>
+    </footer>
 
     <script>
+
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+                document.getElementById("splash").style.opacity = "0"
+
+                setTimeout(function () {
+                    document.getElementById("splash").style.display = "none"
+                }, 400)
+            }, 500)
+        })
         var startTime = 0;
         var stopTime = 0;
         var lapTime = [];
@@ -385,7 +522,7 @@
         var masureing = false;
         var ruisekiData = []
 
-        var Interval = setInterval(function() {
+        var Interval = setInterval(function () {
             if (masureing) {
                 var NowTime = (pastTime + (new Date() - startTime))
 
@@ -393,15 +530,15 @@
             }
 
         }, 10)
-        var Interval2 = setInterval(function() {
+        var Interval2 = setInterval(function () {
             if (masureing) {
 
                 var NowTime = (pastTime + (new Date() - startTime))
 
                 var i = 0;
-                lapTime.forEach(function(elm) {
+                lapTime.forEach(function (elm) {
                     var flagElm = document.getElementById("flag_" + i);
-                    if (!flagElm) {} else {
+                    if (!flagElm) { } else {
                         flagElm.style.left = (elm / NowTime) * 100 + "%"
                         flagElm.classList.add("activeflag")
 
@@ -429,10 +566,10 @@
                 startTime = new Date()
                 masureing = true
 
-                setTimeout(function() {
+                setTimeout(function () {
                     document.getElementById("stopBtn").classList.remove("Anm01")
                     document.getElementById("stopBtn").classList.add("Anm01")
-                    timeout1 = setTimeout(function() {
+                    timeout1 = setTimeout(function () {
                         document.getElementById("stopBtn").classList.remove("Anm01")
                     }, 500)
                 }, 10)
@@ -449,10 +586,10 @@
                 stopTime = new Date()
                 masureing = false;
 
-                setTimeout(function() {
+                setTimeout(function () {
                     document.getElementById("startBtn").classList.remove("Anm01")
                     document.getElementById("startBtn").classList.add("Anm01")
-                    timeout2 = setTimeout(function() {
+                    timeout2 = setTimeout(function () {
                         document.getElementById("startBtn").classList.remove("Anm01")
                     }, 500)
                 }, 10)
@@ -467,22 +604,25 @@
             var lapTimeTmp = timeFormat(NowTime - lapTime[lapTime.length - 2]);
             if (!lapTime[lapTime.length - 2]) lapTimeTmp = timeFormat(NowTime);
 
-            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function (elm) {
                 elm.remove()
             })
 
             for (let i = 0; i < lapTime.length; i++) {
-                var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
-                if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
-                var newTR = document.createElement("tr");
-                newTR.classList.add("addedElm")
-                newTR.setAttribute("id", "tableElm_" + lapTime[i])
-                newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td><td><button data-time='" + lapTime[i] + "' id='Btn_" + lapTime[i] + "'>×</button></td>"
-                document.getElementById("lapTimeTable").appendChild(newTR)
+                if (lapTime[i]) {
 
-                document.getElementById("Btn_" + lapTime[i]).addEventListener("click", function() {
-                    laptimeRemove(this.dataset.time)
-                })
+                    var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
+                    if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
+                    var newTR = document.createElement("tr");
+                    newTR.classList.add("addedElm")
+                    newTR.setAttribute("id", "tableElm_" + lapTime[i])
+                    newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td><td><button data-time='" + lapTime[i] + "' id='Btn_" + lapTime[i] + "'>×</button></td>"
+                    document.getElementById("lapTimeTable").appendChild(newTR)
+
+                    document.getElementById("Btn_" + lapTime[i]).addEventListener("click", function () {
+                        laptimeRemove(this.dataset.time)
+                    })
+                }
             }
             document.getElementById("table_wrap").scrollTo(0, document.getElementById("table_wrap").scrollHeight)
 
@@ -499,6 +639,7 @@
         }
 
         function reset() {
+            if (!confirm("本当にリセットしますか")) return false;
             pause()
 
             document.getElementById("lapTimeTable").style.display = "none"
@@ -507,7 +648,7 @@
             document.getElementById("timer").innerText = "00:00:00.00"
             lapTime = [];
 
-            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function (elm) {
                 elm.remove()
             })
         }
@@ -542,12 +683,12 @@
                 hosu: hosu
             })
 
-            document.querySelectorAll("#straidTable .addedElm").forEach(function(elm) {
+            document.querySelectorAll("#straidTable .addedElm").forEach(function (elm) {
                 elm.remove()
             })
 
 
-            straid.forEach(function(elm) {
+            straid.forEach(function (elm) {
                 var newTR = document.createElement("tr");
                 newTR.classList.add("addedElm")
                 newTR.innerHTML = "<td>" + (elm.id + 1) + "</td><td>" + elm.hohabba + "</td><td>" + elm.hosu + "</td>"
@@ -559,29 +700,41 @@
         }
 
         function laptimeRemove(time) {
-
             var NowTime = (pastTime + (new Date() - startTime))
-
-            console.log(time)
-            lapTime = lapTime.filter(function(elm) {
-                return elm != time
+            var lapElmIndex = lapTime.indexOf(Number(time));
+            var i = 0;
+            lapTime.forEach(function (elm) {
+                if (elm == time) { lapTime[i] = null; }
+                i++
             })
-            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+
+            console.log("flag_" + lapElmIndex, document.getElementById("flag_" + lapElmIndex))
+            document.getElementById("flag_" + lapElmIndex).classList.remove("activeflag")
+            setTimeout(() => {
+                document.getElementById("flag_" + lapElmIndex).style.display = "none"
+            }, 400);
+            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function (elm) {
                 elm.remove()
             })
 
             for (let i = 0; i < lapTime.length; i++) {
-                var lapTimeTmp = timeFormat(lapTime[i] - lapTime[i - 1]);
-                if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
-                var newTR = document.createElement("tr");
-                newTR.classList.add("addedElm")
-                newTR.setAttribute("id", "tableElm_" + lapTime[i])
-                newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td><td><button data-time='" + lapTime[i] + "' id='Btn_" + lapTime[i] + "'>×</button></td>"
-                document.getElementById("lapTimeTable").appendChild(newTR)
+                if (lapTime[i]) {
+                    lttmp = lapTime.filter(function (elm2) { return elm2 !== null })
+                    var beforeElm = lttmp[lttmp.indexOf(lapTime[i]) - 1]
+                    if (!beforeElm) beforeElm = 0
+                    console.log(lapTime[i] - beforeElm)
+                    var lapTimeTmp = timeFormat(lapTime[i] - beforeElm);
 
-                document.getElementById("Btn_" + lapTime[i]).addEventListener("click", function() {
-                    laptimeRemove(this.dataset.time)
-                })
+                    var newTR = document.createElement("tr");
+                    newTR.classList.add("addedElm")
+                    newTR.setAttribute("id", "tableElm_" + lapTime[i])
+                    newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td><td><button data-time='" + lapTime[i] + "' id='Btn_" + lapTime[i] + "' title='削除' aria-label='この記録を削除'>×</button></td>"
+                    document.getElementById("lapTimeTable").appendChild(newTR)
+
+                    document.getElementById("Btn_" + lapTime[i]).addEventListener("click", function () {
+                        laptimeRemove(this.dataset.time)
+                    })
+                }
             }
 
         }
@@ -626,9 +779,9 @@
                             accept: {
                                 "application/json": [".json"],
                             },
-                        }, ],
+                        },],
                     })
-                    .catch(function() {
+                    .catch(function () {
                         return;
                     });
                 var writable = await saveHandle.createWritable();
@@ -648,13 +801,13 @@
 
         }
 
-        document.getElementById("input_file").addEventListener("change", function() {
+        document.getElementById("input_file").addEventListener("change", function () {
             var file = this.files[0];
             fileNameTmp = file.name;
             var reader = new FileReader();
             reader.readAsText(file, "UTF-8");
 
-            reader.onload = function() {
+            reader.onload = function () {
                 data = JSON.parse(reader.result);
                 lapTime = data.lap
                 straid = data.straid
@@ -663,30 +816,32 @@
                 document.getElementById("timer").innerText = timeFormat(pastTime)
 
 
-                document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+                document.querySelectorAll("#lapTimeTable .addedElm").forEach(function (elm) {
                     elm.remove()
                 })
 
                 var NowTime = pastTime
 
                 for (let i = 0; i < lapTime.length; i++) {
-                    var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
-                    if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
-                    var newTR = document.createElement("tr");
-                    newTR.classList.add("addedElm")
-                    newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td>"
-                    document.getElementById("lapTimeTable").appendChild(newTR)
+                    if (lapTime[i]) {
 
+                        var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
+                        if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
+                        var newTR = document.createElement("tr");
+                        newTR.classList.add("addedElm")
+                        newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td>"
+                        document.getElementById("lapTimeTable").appendChild(newTR)
+                    }
                 }
                 document.getElementById("table_wrap").scrollTo(0, document.getElementById("table_wrap").scrollHeight)
                 document.getElementById("table_wrap").style.display = "block"
 
-                document.querySelectorAll("#straidTable .addedElm").forEach(function(elm) {
+                document.querySelectorAll("#straidTable .addedElm").forEach(function (elm) {
                     elm.remove()
                 })
 
 
-                straid.forEach(function(elm) {
+                straid.forEach(function (elm) {
                     var newTR = document.createElement("tr");
                     newTR.classList.add("addedElm")
                     newTR.innerHTML = "<td>" + (elm.id + 1) + "</td><td>" + elm.hohabba + "</td><td>" + elm.hosu + "</td>"
@@ -700,7 +855,7 @@
         })
 
 
-        window.addEventListener("keydown", function(e) {
+        window.addEventListener("keydown", function (e) {
 
             if (e.key == " ") {
                 e.preventDefault()
@@ -709,6 +864,12 @@
                 } else {
                     start()
                 }
+            }
+        })
+        window.addEventListener("beforeunload", function (e) {
+            if (masureing) {
+                e.preventDefault()
+                event.returnValue = 'A';
             }
         })
     </script>
