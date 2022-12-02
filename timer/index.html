@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>持久走便利アプリ</title>
+    <style>
+        html,
+        body {
+            background: #222;
+            color: #ccc;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        
+        button {
+            height: 50px;
+            padding: 0 0.7em;
+            font-size: 20px;
+            border-radius: 5px;
+            background: #999;
+            border: none;
+            margin: 3px 5px;
+        }
+        
+        button:hover {
+            background: #FFF;
+        }
+        
+        #timer {
+            font-size: 11vw;
+            text-align: center;
+            font-family: ui-monospace, sans-serif;
+            font-weight: bold;
+            color: #FFF;
+        }
+        
+        #controlWrap {
+            text-align: center;
+            font-size: 0;
+            vertical-align: middle;
+        }
+        
+        #controlWrap button {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 14px;
+            margin: 15px 5px;
+            transition: 200ms;
+            background: #FFF;
+        }
+        
+        #controlWrap button:hover {
+            box-shadow: 0 0 0 5px #666;
+        }
+        
+        #controlWrap button:active {
+            transition: 100ms;
+            box-shadow: none;
+            transform: scale(0.9);
+        }
+        
+        #controlWrap button:disabled:hover {
+            box-shadow: none;
+        }
+        
+        button#startBtn,
+        button#stopBtn {
+            width: 100px;
+            height: 100px;
+            margin: 5px;
+        }
+        
+        button#stopBtn {
+            display: none;
+        }
+        
+        #table_wrap,
+        #table_wrap2 {
+            display: none;
+            background: #333;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        #lapTimeTable,
+        #straidTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        #lapTimeTable,
+        #lapTimeTable tr,
+        #lapTimeTable th,
+        #lapTimeTable td {
+            border-right: solid 1px #999;
+            border-left: solid 1px #999;
+        }
+        
+        #lapTimeTable th {
+            border-top: solid 1px #999;
+            border-bottom: solid 1px #999;
+        }
+        
+        #lapTimeTable th {
+            font-size: 18px;
+        }
+        
+        #lapTimeTable th,
+        #lapTimeTable td {
+            padding: 8px 5px;
+        }
+        
+        #lapTimeTable tr:nth-child(even) {
+            background: #444;
+        }
+        
+        #progress,
+        #dummy_progress {
+            position: relative;
+            width: 100%;
+            background: rgb(129, 177, 224);
+            height: 5px;
+            margin: 10px 0;
+        }
+        
+        #progress .flag {
+            position: absolute;
+            top: -2.5px;
+            width: 0;
+            height: 0;
+            border-radius: 10px;
+            background: rgb(32, 103, 202);
+            transition: linear 500ms;
+            font-size: 0;
+            color: rgb(32, 103, 202);
+            overflow: hidden;
+            opacity: 0.5;
+        }
+        
+        #progress .flag.activeflag {
+            top: -7.5px;
+            width: 20px;
+            height: 20px;
+            opacity: 1;
+        }
+        
+        #progress .flag.activeflag::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            content: "";
+            width: 20px;
+            height: 20px;
+            background: rgb(32, 103, 202);
+            border-radius: 10px;
+            transition: 500ms;
+        }
+        
+        #progress .flag.activeflag:hover::before {
+            background: rgb(129, 177, 224);
+            transition: 100ms;
+        }
+        
+        #progress .flag.activeflag:hover {
+            width: 200px;
+            height: 50px;
+            font-size: 15px;
+            padding: 3px;
+            color: #FFF;
+            padding-top: 20px;
+            transition: linear 500ms, font-size 100ms, width 100ms, padding 100ms, color 100ms, height 100ms, background 100ms;
+            background: rgb(21, 64, 124);
+            border-radius: 10px 5px 5px 5px;
+        }
+        
+        input {
+            height: 40px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: solid 1px #666;
+            margin: 0 0.4em;
+            width: 200px;
+            padding: 0 0.3em;
+            background: #333;
+            color: #fff;
+        }
+        
+        input:focus {
+            background: #FFF;
+            color: #000;
+            outline: solid 2px rgb(129, 177, 224);
+        }
+        
+        #output {
+            display: none;
+            font-size: 18px;
+        }
+        
+        button {
+            vertical-align: top;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button#stopBtn {
+            background: rgb(157 226 255);
+            animation-name: sampleanimation;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+        }
+        
+        button span {
+            position: absolute;
+            inset: 0;
+            display: none;
+        }
+        
+        button svg {
+            width: 48px;
+            height: 48px;
+            display: inline-block;
+            fill: #444;
+        }
+        
+        button#stopBtn svg {
+            fill: rgb(0, 37, 73);
+        }
+        
+        button:disabled svg {
+            fill: #999;
+        }
+        
+        button:hover svg {
+            transform: scale(0.8);
+            opacity: 0;
+            fill: #666;
+            transition: 300ms;
+        }
+        
+        button:disabled:hover svg {
+            fill: #999;
+        }
+        
+        button.Anm01 svg {
+            transform: scale(10);
+            opacity: 0;
+            fill: #666;
+            transition: 500ms;
+        }
+        
+        button:hover span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 0 1px #FFF);
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        details {
+            margin: 30px 0;
+            padding: 5px;
+            border: solid 1px #666;
+        }
+        
+        summary {
+            background: #333;
+        }
+        
+        summary:hover {
+            background: #555;
+        }
+        
+        @keyframes sampleanimation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(129, 177, 224, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 0 20px rgba(129, 177, 224, 0.1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <noscript>
+        <dialog open>
+            ダウンロードして使ってください
+        </dialog>
+    </noscript>
+    <div id="progress"></div>
+
+    <div id="timer">00:00:00.00</div>
+    <div id="dummy_progress"></div>
+
+    <div id="controlWrap">
+        <button onclick="reset()" id="resetBtn" aria-label="リセット" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M22.55 41.9q-6.15-.5-10.35-5.05Q8 32.3 8 26.05q0-3.85 1.775-7.25t4.975-5.55l2.15 2.15q-2.8 1.65-4.35 4.525Q11 22.8 11 26.05q0 5 3.3 8.65 3.3 3.65 8.25 4.2Zm3 0v-3q5-.6 8.25-4.225 3.25-3.625 3.25-8.625 0-5.45-3.775-9.225Q29.5 13.05 24.05 13.05h-1l3 3-2.15 2.15-6.65-6.65L23.9 4.9l2.15 2.15-3 3h1q6.7 0 11.35 4.675 4.65 4.675 4.65 11.325 0 6.25-4.175 10.8Q31.7 41.4 25.55 41.9Z"/></svg>
+            <span>リセット</span>
+        </button>
+        <button onclick="start()" id="startBtn" aria-label="スタート">
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M18.3 36.4q-.75.5-1.525.05Q16 36 16 35.1V12.6q0-.9.775-1.35.775-.45 1.525.05L36 22.6q.7.45.7 1.25T36 25.1Z"/></svg>
+            <span>スタート</span>
+        </button>
+        <button onclick="pause()" id="stopBtn" aria-label="ストップ">
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M29.25 38q-1.25 0-2.125-.875T26.25 35V13q0-1.25.875-2.125T29.25 10H35q1.25 0 2.125.875T38 13v22q0 1.25-.875 2.125T35 38ZM13 38q-1.25 0-2.125-.875T10 35V13q0-1.25.875-2.125T13 10h5.75q1.25 0 2.125.875T21.75 13v22q0 1.25-.875 2.125T18.75 38Z"/></svg>
+            <span>ストップ</span>
+        </button>
+        <button onclick="lap()" id="laptimeBtn" aria-label="ラップタイム" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M11.5 42q-.65 0-1.075-.425Q10 41.15 10 40.5v-31q0-.65.425-1.075Q10.85 8 11.5 8h14.45q.55 0 .95.325.4.325.5.875l.7 3.1h10.4q.65 0 1.075.425Q40 13.15 40 13.8v15.5q0 .65-.425 1.075-.425.425-1.075.425H28.4q-.5 0-.925-.325-.425-.325-.525-.825l-.7-3.1H13V40.5q0 .65-.425 1.075Q12.15 42 11.5 42Z"/></svg>
+            <span>ラップ<br>タイム</span>
+        </button>
+    </div>
+    <details open>
+        <summary>
+            <h2 style="display: inline">ラップタイム</h2>
+        </summary>
+        <div id="table_wrap">
+            <table id="lapTimeTable">
+                <tr>
+                    <th>id</th>
+                    <th>タイム</th>
+                    <th>ラップタイム</th>
+                    <th>取り消し</th>
+                </tr>
+            </table>
+        </div>
+    </details>
+
+
+
+    <hr style="margin: 50px 0;">
+
+    <details>
+        <summary>
+            <h2 style="display: inline; ">ストライド計算</h2>
+        </summary>
+        <div style="font-size: 20px;">歩数：<input type="number" id="hosu" step="1" value="" placeholder="歩数を入力" min="1">歩</div>
+        <div><button onclick="hosuCalc()">計算</button></div>
+        <div id="output">歩数：<span id="hosuOut"></span>歩/200m　ストライド：<span id="hohaba"> - </span>cm</div>
+
+
+
+        <details open>
+            <summary>
+                <h2 style="display: inline">ストライド履歴</h2>
+            </summary>
+
+            <div id="table_wrap2">
+                <table id="straidTable">
+                    <tr>
+                        <th>id</th>
+                        <th>ストライド</th>
+                        <th>歩数</th>
+                    </tr>
+                </table>
+            </div>
+        </details>
+    </details>
+
+
+    <div style="margin-top: 30px">
+        <button onclick="document.getElementById('input_file').click()">データを読み込み</button>
+        <input type="file" id="input_file" style="display: none;">
+        <button onclick="save()">データを保存</button>
+    </div>
+
+    <footer><small>&copy; 2022 SatoMasakazu</small></footer>
+
+    <script>
+        var startTime = 0;
+        var stopTime = 0;
+        var lapTime = [];
+        var straid = [];
+        var pastTime = 0;
+        var masureing = false;
+        var ruisekiData = []
+
+        var Interval = setInterval(function() {
+            if (masureing) {
+                var NowTime = (pastTime + (new Date() - startTime))
+
+                document.getElementById("timer").innerText = timeFormat((pastTime + (new Date() - startTime)))
+            }
+
+        }, 10)
+        var Interval2 = setInterval(function() {
+            if (masureing) {
+
+                var NowTime = (pastTime + (new Date() - startTime))
+
+                var i = 0;
+                lapTime.forEach(function(elm) {
+                    var flagElm = document.getElementById("flag_" + i);
+                    if (!flagElm) {} else {
+                        flagElm.style.left = (elm / NowTime) * 100 + "%"
+                        flagElm.classList.add("activeflag")
+
+
+                    }
+                    i++;
+
+                })
+            }
+
+        }, 500)
+
+
+        var timeout1;
+        var timeout2;
+
+        function start() {
+            if (!masureing) {
+                document.getElementById("resetBtn").disabled = false
+                document.getElementById("laptimeBtn").disabled = false
+
+                document.getElementById("startBtn").style.display = "none"
+                document.getElementById("stopBtn").style.display = "inline-block"
+
+                startTime = new Date()
+                masureing = true
+
+                setTimeout(function() {
+                    document.getElementById("stopBtn").classList.remove("Anm01")
+                    document.getElementById("stopBtn").classList.add("Anm01")
+                    timeout1 = setTimeout(function() {
+                        document.getElementById("stopBtn").classList.remove("Anm01")
+                    }, 500)
+                }, 10)
+            }
+        }
+
+        function pause() {
+            if (masureing) {
+                document.getElementById("laptimeBtn").disabled = true
+                document.getElementById("startBtn").style.display = "inline-block"
+                document.getElementById("stopBtn").style.display = "none"
+
+                pastTime = pastTime + (new Date() - startTime)
+                stopTime = new Date()
+                masureing = false;
+
+                setTimeout(function() {
+                    document.getElementById("startBtn").classList.remove("Anm01")
+                    document.getElementById("startBtn").classList.add("Anm01")
+                    timeout2 = setTimeout(function() {
+                        document.getElementById("startBtn").classList.remove("Anm01")
+                    }, 500)
+                }, 10)
+            }
+        }
+
+        function lap() {
+            document.getElementById("table_wrap").style.display = "block"
+
+            var NowTime = (pastTime + (new Date() - startTime))
+            lapTime.push(NowTime)
+            var lapTimeTmp = timeFormat(NowTime - lapTime[lapTime.length - 2]);
+            if (!lapTime[lapTime.length - 2]) lapTimeTmp = timeFormat(NowTime);
+
+            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+                elm.remove()
+            })
+
+            for (let i = 0; i < lapTime.length; i++) {
+                var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
+                if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
+                var newTR = document.createElement("tr");
+                newTR.classList.add("addedElm")
+                newTR.setAttribute("id", "tableElm_" + lapTime[i])
+                newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td><td><button data-time='" + lapTime[i] + "' id='Btn_" + lapTime[i] + "'>×</button></td>"
+                document.getElementById("lapTimeTable").appendChild(newTR)
+
+                document.getElementById("Btn_" + lapTime[i]).addEventListener("click", function() {
+                    laptimeRemove(this.dataset.time)
+                })
+            }
+            document.getElementById("table_wrap").scrollTo(0, document.getElementById("table_wrap").scrollHeight)
+
+
+            var newFlag = document.createElement("div")
+            newFlag.style.left = "100%"
+            newFlag.classList.add("flag")
+            newFlag.setAttribute("id", "flag_" + (lapTime.length - 1))
+            newFlag.innerText = "ID:" + lapTime.length + "\nラップタイム:" + lapTimeTmp;
+
+
+            document.getElementById("progress").appendChild(newFlag)
+
+        }
+
+        function reset() {
+            pause()
+
+            document.getElementById("lapTimeTable").style.display = "none"
+            document.getElementById("progress").innerHTML = ""
+
+            document.getElementById("timer").innerText = "00:00:00.00"
+            lapTime = [];
+
+            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+                elm.remove()
+            })
+        }
+        //
+        //
+        //
+
+
+        var kyori = 200;
+        var hosu = 0;
+
+        function hosuCalc() {
+            hosu = Number(document.getElementById("hosu").value)
+            if (hosu % 1 !== 0) {
+                alert("不正な入力がありました");
+                hosu = Math.floor(hosu)
+                document.getElementById("hosu").value = hosu
+            } else if (hosu == 0) {
+                return alert("不正な入力がありました");
+            } else if (hosu < 0) {
+                alert("不正な入力がありました");
+                hosu = Math.abs(hosu)
+                document.getElementById("hosu").value = hosu
+            }
+            document.getElementById("output").style.display = "block"
+
+            document.getElementById("hohaba").innerText = Math.floor(kyori * 10000 / hosu) / 100
+            document.getElementById("hosuOut").innerText = hosu
+            straid.push({
+                id: straid.length,
+                hohabba: Math.floor(kyori * 10000 / hosu) / 100,
+                hosu: hosu
+            })
+
+            document.querySelectorAll("#straidTable .addedElm").forEach(function(elm) {
+                elm.remove()
+            })
+
+
+            straid.forEach(function(elm) {
+                var newTR = document.createElement("tr");
+                newTR.classList.add("addedElm")
+                newTR.innerHTML = "<td>" + (elm.id + 1) + "</td><td>" + elm.hohabba + "</td><td>" + elm.hosu + "</td>"
+                document.getElementById("straidTable").appendChild(newTR)
+            })
+            document.getElementById("table_wrap2").scrollTo(0, document.getElementById("table_wrap2").scrollHeight)
+            document.getElementById("table_wrap2").style.display = "block"
+
+        }
+
+        function laptimeRemove(time) {
+
+            var NowTime = (pastTime + (new Date() - startTime))
+
+            console.log(time)
+            lapTime = lapTime.filter(function(elm) {
+                return elm != time
+            })
+            document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+                elm.remove()
+            })
+
+            for (let i = 0; i < lapTime.length; i++) {
+                var lapTimeTmp = timeFormat(lapTime[i] - lapTime[i - 1]);
+                if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
+                var newTR = document.createElement("tr");
+                newTR.classList.add("addedElm")
+                newTR.setAttribute("id", "tableElm_" + lapTime[i])
+                newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td><td><button data-time='" + lapTime[i] + "' id='Btn_" + lapTime[i] + "'>×</button></td>"
+                document.getElementById("lapTimeTable").appendChild(newTR)
+
+                document.getElementById("Btn_" + lapTime[i]).addEventListener("click", function() {
+                    laptimeRemove(this.dataset.time)
+                })
+            }
+
+        }
+
+        function timeFormat(time) {
+            if (!time) return false
+            time /= 1000
+            time = Math.floor(time * 100) / 100;
+            h = Math.floor(time / 3600)
+            m = Math.floor((time % 3600) / 60)
+            s = Math.floor((time % 3600) % 60 % 60)
+            s2 = Math.floor(((time % 3600) % 60 % 60 % 1) * 100);
+            h = String(h).padStart(2, "0");
+            m = String(m).padStart(2, "0");
+            s = String(s).padStart(2, "0")
+            s2 = String(s2).padStart(2, "0")
+
+            return h + ":" + m + ":" + s + "." + s2
+        }
+
+        async function save() {
+            var nowTimeTmp;
+            if (masureing) {
+                nowTimeTmp = pastTime + (new Date() - startTime)
+            } else {
+                nowTimeTmp = pastTime;
+            }
+
+
+            var saveData = {
+                lap: lapTime,
+                straid: straid,
+                time: nowTimeTmp
+            };
+            var saveData = JSON.stringify(saveData)
+            if (window.showSaveFilePicker) {
+                var saveHandle = await window
+                    .showSaveFilePicker({
+                        suggestedName: "ストップウォッチデータ_" + new Date().getMonth() + "月" + new Date().getDate() + "日_" + new Date().getHours() + "時" + new Date().getMinutes() + "分",
+                        types: [{
+                            description: "JSONファイル",
+                            accept: {
+                                "application/json": [".json"],
+                            },
+                        }, ],
+                    })
+                    .catch(function() {
+                        return;
+                    });
+                var writable = await saveHandle.createWritable();
+                await writable.write(saveData);
+                await writable.close();
+            } else {
+                var bom = new Uint8Array([0xef, 0xbb, 0xbf]); //UTF-8
+
+                var blob = new Blob([bom, saveData], {
+                    type: "application/json",
+                });
+                var link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = DefaultName;
+                link.click();
+            }
+
+        }
+
+        document.getElementById("input_file").addEventListener("change", function() {
+            var file = this.files[0];
+            fileNameTmp = file.name;
+            var reader = new FileReader();
+            reader.readAsText(file, "UTF-8");
+
+            reader.onload = function() {
+                data = JSON.parse(reader.result);
+                lapTime = data.lap
+                straid = data.straid
+                pastTime = data.time
+
+                document.getElementById("timer").innerText = timeFormat(pastTime)
+
+
+                document.querySelectorAll("#lapTimeTable .addedElm").forEach(function(elm) {
+                    elm.remove()
+                })
+
+                var NowTime = pastTime
+
+                for (let i = 0; i < lapTime.length; i++) {
+                    var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
+                    if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
+                    var newTR = document.createElement("tr");
+                    newTR.classList.add("addedElm")
+                    newTR.innerHTML = "<td>" + (i + 1) + "</td><td>" + timeFormat(lapTime[i]) + "</td><td>" + lapTimeTmp + "</td>"
+                    document.getElementById("lapTimeTable").appendChild(newTR)
+
+                }
+                document.getElementById("table_wrap").scrollTo(0, document.getElementById("table_wrap").scrollHeight)
+                document.getElementById("table_wrap").style.display = "block"
+
+                document.querySelectorAll("#straidTable .addedElm").forEach(function(elm) {
+                    elm.remove()
+                })
+
+
+                straid.forEach(function(elm) {
+                    var newTR = document.createElement("tr");
+                    newTR.classList.add("addedElm")
+                    newTR.innerHTML = "<td>" + (elm.id + 1) + "</td><td>" + elm.hohabba + "</td><td>" + elm.hosu + "</td>"
+                    document.getElementById("straidTable").appendChild(newTR)
+                })
+                document.getElementById("table_wrap2").scrollTo(0, document.getElementById("table_wrap2").scrollHeight)
+                document.getElementById("table_wrap2").style.display = "block"
+
+
+            }
+        })
+
+
+        window.addEventListener("keydown", function(e) {
+
+            if (e.key == " ") {
+                e.preventDefault()
+                if (masureing) {
+                    pause()
+                } else {
+                    start()
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
