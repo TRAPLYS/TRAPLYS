@@ -650,7 +650,9 @@
 
             document.getElementById("timer").innerText = "00:00:00.00"
             lapTime = [];
-
+            startTime = 0;
+            stopTime = 0;
+            pastTime = 0;
             document.querySelectorAll("#lapTimeTable .addedElm").forEach(function (elm) {
                 elm.remove()
             })
