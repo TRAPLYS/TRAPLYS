@@ -614,7 +614,7 @@
             for (let i = 0; i < lapTime.length; i++) {
                 if (lapTime[i]) {
 
-                    var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
+                    var lapTimeTmp = timeFormat(lapTime[i] - lapTime[i - 1]);
                     if (!lapTime[i - 1]) lapTimeTmp = timeFormat(lapTime[0]);
                     var newTR = document.createElement("tr");
                     newTR.classList.add("addedElm")
@@ -830,7 +830,7 @@
                 for (let i = 0; i < lapTime.length; i++) {
                     if (lapTime[i]) {
 
-                        var lapTimeTmp = timeFormat(NowTime - lapTime[i - 1]);
+                        var lapTimeTmp = timeFormat(lapTime[i] - lapTime[i - 1]);
                         if (!lapTime[i - 1]) lapTimeTmp = timeFormat(NowTime);
                         var newTR = document.createElement("tr");
                         newTR.classList.add("addedElm")
