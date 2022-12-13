@@ -643,7 +643,9 @@
 
         function reset() {
             if (!confirm("本当にリセットしますか")) return false;
+            location.reload()
             pause()
+       
 
             document.getElementById("lapTimeTable").style.display = "none"
             document.getElementById("progress").innerHTML = ""
